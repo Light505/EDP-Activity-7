@@ -50,7 +50,7 @@ namespace InformationSystem
                 using (MySqlCommand cmd = new MySqlCommand(insertQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@password", PasswordHasher.HashPassword(password));
+                    cmd.Parameters.AddWithValue("@password", password);
                     cmd.Parameters.AddWithValue("@first_name", firstName);
                     cmd.Parameters.AddWithValue("@last_name", lastName);
                     cmd.Parameters.AddWithValue("@email", email);

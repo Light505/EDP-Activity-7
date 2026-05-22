@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4B5E4150-84E0-46A2-936D-401CC7096DE3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>InformationSystem</RootNamespace>
-    <AssemblyName>InformationSystem</AssemblyName>
+    <RootNamespace>WindowsFormsApp1</RootNamespace>
+    <AssemblyName>WindowsFormsApp1</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -145,7 +145,6 @@
     <Compile Include="PasswordRecoveryForm.Designer.cs">
       <DependentUpon>PasswordRecoveryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PasswordHasher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterForm.cs">

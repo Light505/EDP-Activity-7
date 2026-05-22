@@ -41,7 +41,7 @@ namespace InformationSystem
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(53, 13);
             this.lblPassword.TabIndex = 27;
-            this.lblPassword.Text = "New Password";
+            this.lblPassword.Text = "Password";
             // 
             // lblUsername
             // 

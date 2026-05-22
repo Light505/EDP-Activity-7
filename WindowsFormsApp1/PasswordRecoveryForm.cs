@@ -60,7 +60,7 @@ namespace InformationSystem
                     {
                         cmd.Parameters.AddWithValue("@username", username);
                         cmd.Parameters.AddWithValue("@email", email);
-                        cmd.Parameters.AddWithValue("@password", PasswordHasher.HashPassword(newPassword));
+                        cmd.Parameters.AddWithValue("@password", newPassword);
 
                         int rows = cmd.ExecuteNonQuery();
 

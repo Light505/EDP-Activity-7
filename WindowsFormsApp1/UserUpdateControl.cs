@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -31,7 +30,7 @@ namespace InformationSystem
                 conn.Open();
 
                 string query = @"
-                    SELECT username, first_name, last_name, email
+                    SELECT username, password, first_name, last_name, email
                     FROM users
                     WHERE user_id = @user_id";
 
@@ -44,7 +43,7 @@ namespace InformationSystem
                         if (reader.Read())
                         {
                             txtUsername.Text = reader.GetString("username");
-                            txtPassword.Clear();
+                            txtPassword.Text = reader.GetString("password");
                             txtFirstName.Text = reader.GetString("first_name");
                             txtLastName.Text = reader.GetString("last_name");
                             txtEmail.Text = reader.GetString("email");
@@ -74,6 +73,7 @@ namespace InformationSystem
             string email = txtEmail.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(password) ||
                 string.IsNullOrWhiteSpace(firstName) ||
                 string.IsNullOrWhiteSpace(lastName) ||
                 string.IsNullOrWhiteSpace(email))
@@ -82,47 +82,23 @@ namespace InformationSystem
                 return;
             }
 
-            if (!IsValidEmail(email))
-            {
-                MessageBox.Show("Invalid email format.");
-                return;
-            }
-
             using (MySqlConnection conn = dbConnection.GetConnection())
             {
                 conn.Open();
 
-                if (UsernameOrEmailExists(conn, userId, username, email))
-                {
-                    MessageBox.Show("Username or email already exists.");
-                    return;
-                }
-
-                string query = string.IsNullOrWhiteSpace(password)
-                    ? @"
-                        UPDATE users
-                        SET username = @username,
-                            first_name = @first_name,
-                            last_name = @last_name,
-                            email = @email
-                        WHERE user_id = @user_id"
-                    : @"
-                        UPDATE users
-                        SET username = @username,
-                            password = @password,
-                            first_name = @first_name,
-                            last_name = @last_name,
-                            email = @email
-                        WHERE user_id = @user_id";
+                string query = @"
+                    UPDATE users
+                    SET username = @username,
+                        password = @password,
+                        first_name = @first_name,
+                        last_name = @last_name,
+                        email = @email
+                    WHERE user_id = @user_id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@username", username);
-                    if (!string.IsNullOrWhiteSpace(password))
-                    {
-                        cmd.Parameters.AddWithValue("@password", PasswordHasher.HashPassword(password));
-                    }
-
+                    cmd.Parameters.AddWithValue("@password", password);
                     cmd.Parameters.AddWithValue("@first_name", firstName);
                     cmd.Parameters.AddWithValue("@last_name", lastName);
                     cmd.Parameters.AddWithValue("@email", email);
@@ -149,30 +125,6 @@ namespace InformationSystem
             txtFirstName.Clear();
             txtLastName.Clear();
             txtEmail.Clear();
-        }
-
-        private bool UsernameOrEmailExists(MySqlConnection conn, int userId, string username, string email)
-        {
-            string query = @"
-                SELECT COUNT(*)
-                FROM users
-                WHERE (username = @username OR email = @email)
-                  AND user_id <> @user_id";
-
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                cmd.Parameters.AddWithValue("@username", username);
-                cmd.Parameters.AddWithValue("@email", email);
-                cmd.Parameters.AddWithValue("@user_id", userId);
-
-                int count = Convert.ToInt32(cmd.ExecuteScalar());
-                return count > 0;
-            }
-        }
-
-        private bool IsValidEmail(string email)
-        {
-            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
     }
 }

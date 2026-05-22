@@ -35,12 +35,6 @@ namespace InformationSystem
 
         private void btnUserManagementForm_Click(object sender, EventArgs e)
         {
-            if (!IsAdmin())
-            {
-                MessageBox.Show("Only administrators can access user management.");
-                return;
-            }
-
             UserManagementForm userManagement = new UserManagementForm(currentUserRole);
             userManagement.Show();
             this.Close();
@@ -51,11 +45,6 @@ namespace InformationSystem
             TransactionManagementForm transactionManagementForm = new TransactionManagementForm(currentUserRole);
             transactionManagementForm.Show();
             this.Close();
-        }
-
-        private bool IsAdmin()
-        {
-            return string.Equals(currentUserRole, "Admin", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
