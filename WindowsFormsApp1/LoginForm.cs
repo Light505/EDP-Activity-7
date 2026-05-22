@@ -35,26 +35,32 @@ namespace InformationSystem
                     conn.Open();
 
                     string query = @"
-                        SELECT user_id, first_name, last_name, role
+                        SELECT user_id, first_name, last_name, role, password
                         FROM users
                         WHERE username = @username
-                          AND password = @password
                           AND is_active = 1";
 
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@username", username);
-                        cmd.Parameters.AddWithValue("@password", password);
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if (reader.Read())
+                            if (reader.Read() && PasswordHasher.VerifyPassword(password, reader.GetString("password")))
                             {
+                                int userId = reader.GetInt32("user_id");
                                 string firstName = reader.GetString("first_name");
                                 string lastName = reader.GetString("last_name");
                                 string role = reader.GetString("role");
+                                string storedPassword = reader.GetString("password");
 
                                 MessageBox.Show($"Welcome, {firstName} {lastName}!");
+
+                                if (!PasswordHasher.IsHashed(storedPassword))
+                                {
+                                    reader.Close();
+                                    UpgradePasswordHash(conn, userId, password);
+                                }
 
                                 DashboardForm dashboard = new DashboardForm(role);
                                 dashboard.Show();
@@ -71,6 +77,18 @@ namespace InformationSystem
                 {
                     MessageBox.Show("Error: " + ex.Message);
                 }
+            }
+        }
+
+        private void UpgradePasswordHash(MySqlConnection conn, int userId, string password)
+        {
+            string query = "UPDATE users SET password = @password WHERE user_id = @user_id";
+
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@password", PasswordHasher.HashPassword(password));
+                cmd.Parameters.AddWithValue("@user_id", userId);
+                cmd.ExecuteNonQuery();
             }
         }
 
